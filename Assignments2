@@ -35,6 +35,7 @@ cronjob.batch/batch-job-every-fifteen-minutes created
 kubectl get jobs
 
 5.Observe and if possible, paste the results from your practicals.
+A batch job created to run evry 15mins once. 
 [root@ip-172-31-29-198 04-controllers]# kubectl apply -f cronjob.yaml
 cronjob.batch/batch-job-every-fifteen-minutes created
 [root@ip-172-31-29-198 04-controllers]#
