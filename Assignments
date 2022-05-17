@@ -1,0 +1,63 @@
+1.What are the differences file-wise?
+Api version: API version of  kubia-rc.yaml is v1 whereas kubia-replicaset.yaml is apps/v1.
+Kind: ReplicationController used in kubia-rc.yaml and ReplicaSet in kubia-replicaset.yaml.
+metadata: name is kubia2 in kubia-rc.yaml  whereas kubia in kubia-replicaset.yaml.
+Ports: Container port given in kubia-rc.yaml and there is no port kubia-replicaset.yaml.
+
+2.Run the kubia-replicaset.yaml .
+
+[root@ip-172-31-29-198 05-services]# kubectl apply -f kubia-replicaset.yaml
+replicaset.apps/kubia created
+[root@ip-172-31-29-198 05-services]#
+[root@ip-172-31-29-198 05-services]#
+
+3.Identify what commands can be run after "kubectl apply...."
+[root@ip-172-31-29-198 05-services]# kubectl get pod to see if pods are created.
+NAME           READY   STATUS    RESTARTS   AGE
+kubia-6g8nd    1/1     Running   0          101s
+kubia-8snfz    1/1     Running   0          101s
+kubia-989sp    1/1     Running   0          101s
+kubia2-8p5l6   1/1     Running   0          4d16h
+kubia2-99n6w   1/1     Running   0          4d16h
+kubia2-tchbj   1/1     Running   0          3d19h
+
+
+
+4.Make a service over these pods (kubia-replicaset) and see if the service picks up the web-service within the pod ("You have hit....." message)
+
+[root@ip-172-31-29-198 03-Pods]# kubectl get pod -o wide
+NAME           READY   STATUS    RESTARTS   AGE     IP               NODE                                               NOMINATED NODE   READINESS GATES
+kubia-6g8nd    1/1     Running   0          13m     192.168.110.76   ip-172-31-29-198.ap-southeast-1.compute.internal   <none>           <none>
+kubia-8snfz    1/1     Running   0          13m     192.168.110.78   ip-172-31-29-198.ap-southeast-1.compute.internal   <none>           <none>
+kubia-989sp    1/1     Running   0          13m     192.168.110.77   ip-172-31-29-198.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-8p5l6   1/1     Running   0          4d16h   192.168.110.71   ip-172-31-29-198.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-99n6w   1/1     Running   0          4d16h   192.168.110.70   ip-172-31-29-198.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-tchbj   1/1     Running   0          3d19h   192.168.110.75   ip-172-31-29-198.ap-southeast-1.compute.internal   <none>           <none>
+[root@ip-172-31-29-198 03-Pods]#
+[root@ip-172-31-29-198 03-Pods]#
+[root@ip-172-31-29-198 03-Pods]# curl 192.168.110.76:8080
+You've hit kubia-6g8nd
+[root@ip-172-31-29-198 03-Pods]#
+[root@ip-172-31-29-198 03-Pods]#
+[root@ip-172-31-29-198 03-Pods]#
+
+5. Negative Testing : change the labels of the pod and see if the service is still applied on those pods.
+Yes.
+
+[root@ip-172-31-29-198 03-Pods]# kubectl label po kubia-6g8nd app=mavenir --overwrite
+pod/kubia-6g8nd labeled
+[root@ip-172-31-29-198 03-Pods]# kubectl get pod -o wide
+NAME           READY   STATUS    RESTARTS   AGE     IP               NODE                                               NOMINATED NODE   READINESS GATES
+kubia-5llz5    1/1     Running   0          4s      192.168.110.79   ip-172-31-29-198.ap-southeast-1.compute.internal   <none>           <none>
+kubia-6g8nd    1/1     Running   0          16m     192.168.110.76   ip-172-31-29-198.ap-southeast-1.compute.internal   <none>           <none>
+kubia-8snfz    1/1     Running   0          16m     192.168.110.78   ip-172-31-29-198.ap-southeast-1.compute.internal   <none>           <none>
+kubia-989sp    1/1     Running   0          16m     192.168.110.77   ip-172-31-29-198.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-8p5l6   1/1     Running   0          4d16h   192.168.110.71   ip-172-31-29-198.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-99n6w   1/1     Running   0          4d16h   192.168.110.70   ip-172-31-29-198.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-tchbj   1/1     Running   0          3d19h   192.168.110.75   ip-172-31-29-198.ap-southeast-1.compute.internal   <none>           <none>
+[root@ip-172-31-29-198 03-Pods]# curl 192.168.110.79:8080
+You've hit kubia-5llz5
+[root@ip-172-31-29-198 03-Pods]#
+
+
+
