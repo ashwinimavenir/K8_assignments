@@ -1,0 +1,97 @@
+1.go to cronjob.yaml (/root/kubernetes-training/04-controllers)
+
+[root@ip-172-31-29-198 04-controllers]# cat cronjob.yaml
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: batch-job-every-fifteen-minutes
+spec:
+  schedule: "0,15,30,45 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: periodic-batch-job
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: main
+            image: luksa/batch-job
+[root@ip-172-31-29-198 04-controllers]# pwd
+/root/kubernetes-training/04-controllers
+
+
+2.Open the file and change the 1st line to (apiVersion: batch/v1beta1).
+
+First line is already at batch/v1beta1. Hence no changes made. 
+
+3.Run this file
+[root@ip-172-31-29-198 04-controllers]# kubectl apply -f cronjob.yaml
+cronjob.batch/batch-job-every-fifteen-minutes created
+[root@ip-172-31-29-198 04-controllers]#
+
+4.Find out what is the command to "get" the running jobs.
+kubectl get jobs
+
+5.Observe and if possible, paste the results from your practicals.
+[root@ip-172-31-29-198 04-controllers]# kubectl apply -f cronjob.yaml
+cronjob.batch/batch-job-every-fifteen-minutes created
+[root@ip-172-31-29-198 04-controllers]#
+[root@ip-172-31-29-198 04-controllers]#
+[root@ip-172-31-29-198 04-controllers]# kubectl get pod
+NAME           READY   STATUS    RESTARTS   AGE
+kubia-5llz5    1/1     Running   0          12m
+kubia-6g8nd    1/1     Running   0          28m
+kubia-8snfz    1/1     Running   0          28m
+kubia-989sp    1/1     Running   0          28m
+kubia2-8p5l6   1/1     Running   0          4d16h
+kubia2-99n6w   1/1     Running   0          4d16h
+kubia2-tchbj   1/1     Running   0          3d20h
+[root@ip-172-31-29-198 04-controllers]#
+[root@ip-172-31-29-198 04-controllers]#
+[root@ip-172-31-29-198 04-controllers]#
+[root@ip-172-31-29-198 04-controllers]# kubectl get cronjob.batch/batch-job-every-fifteen-minutes
+NAME                              SCHEDULE             SUSPEND   ACTIVE   LAST SCHEDULE   AGE
+batch-job-every-fifteen-minutes   0,15,30,45 * * * *   False     0        <none>          78s
+[root@ip-172-31-29-198 04-controllers]#
+[root@ip-172-31-29-198 04-controllers]#
+[root@ip-172-31-29-198 04-controllers]#
+[root@ip-172-31-29-198 04-controllers]#
+[root@ip-172-31-29-198 04-controllers]# kubectl describe  cronjob.batch/batch-job-every-fifteen-minutes
+Name:                          batch-job-every-fifteen-minutes
+Namespace:                     ashwini
+Labels:                        <none>
+Annotations:                   Schedule:  0,15,30,45 * * * *
+Concurrency Policy:            Allow
+Suspend:                       False
+Successful Job History Limit:  3
+Failed Job History Limit:      1
+Starting Deadline Seconds:     <unset>
+Selector:                      <unset>
+Parallelism:                   <unset>
+Completions:                   <unset>
+Pod Template:
+  Labels:  app=periodic-batch-job
+  Containers:
+   main:
+    Image:           luksa/batch-job
+    Port:            <none>
+    Host Port:       <none>
+    Environment:     <none>
+    Mounts:          <none>
+  Volumes:           <none>
+Last Schedule Time:  <unset>
+Active Jobs:         <none>
+Events:              <none>
+[root@ip-172-31-29-198 04-controllers]#
+
+6.Also identify how you would "permanently arrest" the jobs from running.
+
+[root@ip-172-31-29-198 04-controllers]# kubectl delete cronjob.batch/batch-job-every-fifteen-minutes
+cronjob.batch "batch-job-every-fifteen-minutes" deleted
+[root@ip-172-31-29-198 04-controllers]#
+
+
+7.What is the change from normal Jobs (jobs v/s cronJobs) - Your observation in one sentence.
+Both are used to perform specific task to which they are assigned. Only difference is cronjobs execute at scheduled intervals. 
