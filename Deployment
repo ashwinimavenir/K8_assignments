@@ -1,0 +1,10 @@
+Suppose you have deployed your application using a deployment controller. Assume the initial number of replicas is one. Write the steps needed to update a container's image using deployment, making sure that there is zero downtime.
+1.create
+kubectl create -f kubia-deployment-and-service-v1.yaml --record
+2.To modify replicas using below patch
+kubectl patch deployment kubia -p '{"spec": {"replicas": 10}}'
+3.change image
+kubectl set image deployment kubia nodejs=luksa/kubia:v2
+kubectl set image deployment kubia nodejs=luksa/kubia:v3
+4.Verify status
+kubectl rollout status deployment kubia
