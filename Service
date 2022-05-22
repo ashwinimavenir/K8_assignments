@@ -1,0 +1,12 @@
+You have deployed an application, that is listening at port 8000. You used a replica-set to deploy it and created a NodePort service to make it accessible. But when you test it, somehow the application is not reachable at the port. Write down your approach and sequentially all the steps that you will take to find out the issue.
+
+
+1.Check the svc to see if the ports are assigned and clusetr IP is proper. 
+kubectl get svc
+2.Check the endpoint allocations.
+kubectl get ep
+3.testing and debugging locally we can use this command 
+kubectl port-forward svc/node-red -n <replace-namespace-name> 1880:1
+4.once command running open the browser and open URL
+
+HTTP://localhost:1880
